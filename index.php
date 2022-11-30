@@ -6,6 +6,7 @@ use API\DB;
 use API\MongoDB;
 use API\APIInterface;
 
+//used DB class
 $DBData = [
     "host" => "hostName",
     "databaseName" => "databaseName",
@@ -16,6 +17,7 @@ $apiFactory = new APIFactory();
 $getDBData = $apiFactory->create(DB::NAME, $DBData)->get();
 print_r($getDBData);
 
+//used GoogleAnalitycs class
 $googleAnalitycsData = [
     "appName" => "App Name",
     "scope" => [
@@ -25,6 +27,7 @@ $googleAnalitycsData = [
 $getAnalitycsData = $apiFactory->create(GoogleAnalitycs::NAME, $googleAnalitycsData, APIInterface::FORMAT_XML)->get(); //set return to be in xml format
 print_r($getAnalitycsData);
 
+//used MongoDB class
 $mobgoDBData = [
     "user" => "user",
     "password" => "*****",
