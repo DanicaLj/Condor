@@ -4,6 +4,7 @@ use API\APIFactory;
 use API\GoogleAnalitycs;
 use API\DB;
 use API\MongoDB;
+use API\APIInterface;
 
 $DBData = [
     "host" => "hostName",
@@ -12,8 +13,8 @@ $DBData = [
     "password" => "*****"
 ];
 $apiFactory = new APIFactory();
-$getData = $apiFactory->create(DB::NAME, $DBData)->getConnection()->get();
-print_r($getData);
+$getDBData = $apiFactory->create(DB::NAME, $DBData)->get();
+print_r($getDBData);
 
 $googleAnalitycsData = [
     "appName" => "App Name",
@@ -21,13 +22,14 @@ $googleAnalitycsData = [
         "'https://www.googleapis.com/auth/analytics.readonly'"
     ]
 ];
-$getData = $apiFactory->create(GoogleAnalitycs::NAME, $googleAnalitycsData)->getConnection()->get();
-print_r($getData);
+$getAnalitycsData = $apiFactory->create(GoogleAnalitycs::NAME, $googleAnalitycsData, APIInterface::FORMAT_XML)->get(); //set return to be in xml format
+print_r($getAnalitycsData);
 
 $mobgoDBData = [
     "user" => "user",
     "password" => "*****",
     "cluster" => "mycluster.mongodb.net"
 ];
-$getData = $apiFactory->create(MongoDB::NAME, $mobgoDBData)->getConnection()->getById();
-print_r($getData);
+$id = 1;
+$getMongoData = $apiFactory->create(MongoDB::NAME, $mobgoDBData)->getById($id);
+print_r($getMongoData);

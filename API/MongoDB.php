@@ -3,8 +3,8 @@
 namespace API;
 
 use API\APIInterface;
-
-class MongoDB implements APIInterface
+use API\Helper;
+class MongoDB extends Helper implements APIInterface
 {
     public const NAME = "MongoDB";
 
@@ -12,27 +12,19 @@ class MongoDB implements APIInterface
         private string $user,
         private string $password,
         private string $cluster,
+        private string $format,
         private $connection = null
     ) {
-        $this->user = $user;
-        $this->password = $password;
-        $this->cluster = $cluster;
-        $this->connection = $connection;
-    }
-
-    public function getConnection()
-    {
         if (!isset($this->connection)) {
             try {
                 $this->connection = new \MongoDB\Client(
-                    'mongodb+srv://' . $this->user . ':' . $this->password . '@' . $this->cluster . '/test'
+                    'mongodb+srv://' . $user . ':' . $password . '@' . $cluster . '/test'
                 );
             } catch (\PDOException $exception) {
                 echo "Error occured: " . $exception->getMessage();
             }
         }
-
-        return $this->connection;
+        $this->format = $format;
     }
 
     public function get()
@@ -49,7 +41,13 @@ class MongoDB implements APIInterface
             'email' => 'admin@example.com',
             'name' => 'Admin User',
         ]);
-        return $result;
+
+        if ($this->format == APIInterface::FORMAT_XML) { //this should be added in all API methods
+            return $this->arrayToXml($result);
+        }
+
+        //check if result is already json
+        return $this->isJSON($result) ? $this->isJSON($result) : json_encode($result);
     }
 
     public function create($data)

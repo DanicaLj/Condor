@@ -4,6 +4,9 @@ namespace API;
 
 interface APIInterface
 {
+    public const FORMAT_JSON = 'json';
+    public const FORMAT_XML = 'xml';
+    
     //#[Route("/api/data", methods: ["GET"])]
     public function get();
     //#[Route("/api/data/{id}", methods: ["GET"])]

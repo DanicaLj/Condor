@@ -3,8 +3,9 @@
 namespace API;
 
 use API\APIInterface;
+use API\Helper;
 
-class GoogleAnalitycs implements APIInterface
+class GoogleAnalitycs extends Helper implements APIInterface
 {
     public const KEY_FILE_LOCATION = __DIR__ . '/service-account-credentials.json'; //example
     public const NAME = "GoogleAnalitycs";
@@ -12,35 +13,33 @@ class GoogleAnalitycs implements APIInterface
     public function __construct(
         private string $appName,
         private array $scope,
-        private $analytics = null
+        private string $format,
+        private $analytics = null        
     ) {
-        $this->appName = $appName;
-        $this->scope = $scope;
-        $this->analytics = $analytics;
-    }
-
-    public function getConnection()
-    {
         if (!isset($this->analytics)) {
             try {
                 // Create and configure a new client object.
                 $client = new Google_Client();
-                $client->setApplicationName($this->appName);
+                $client->setApplicationName($appName);
                 $client->setAuthConfig(self::KEY_FILE_LOCATION);
-                $client->setScopes($this->scope);
+                $client->setScopes($scope);
                 $this->analytics = new Google_Service_Analytics($client);
             } catch (\PDOException $exception) {
                 echo "Error occured: " . $exception->getMessage();
             }
         }
-
-        return $this->analytics;
+        $this->format = $format;
     }
+
     public function get()
     {
         // Get the list of accounts for the authorized user.
-        $accounts = $this->analytics->management_accounts->listManagementAccounts();
-        return $accounts;
+        $accounts = $this->analytics->management_accounts->listManagementAccounts()->getItems();
+
+        if ($this->format == APIInterface::FORMAT_XML) { //this should be added in all API methods
+            return $this->arrayToXml($accounts);
+        }
+        return json_encode($accounts);
     }
 
     public function getById($id)

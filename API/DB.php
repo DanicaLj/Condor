@@ -3,8 +3,9 @@
 namespace API;
 
 use API\APIInterface;
+use API\Helper;
 
-class DB implements APIInterface
+class DB extends Helper implements APIInterface
 {
     public const NAME = "DB";
 
@@ -13,27 +14,18 @@ class DB implements APIInterface
         private string $databaseName,
         private string $username,
         private string $password,
+        private string $format,
         private string $table = 'table',
         private $connection = null
     ) {
-        $this->host = $host;
-        $this->databaseName = $databaseName;
-        $this->username = $username;
-        $this->password = $password;
-        $this->table = $table;
-        $this->connection = $connection;
-    }
-
-    public function getConnection()
-    {
         if (!isset($this->connection)) {
             try {
-                $this->connection = new \PDO("mysql:host=" . $this->host . ";dbname=" . $this->databaseName, $this->username, $this->password);
+                $this->connection = new \PDO("mysql:host=" . $host . ";dbname=" . $databaseName, $username, $password);
             } catch (\PDOException $exception) {
                 echo "Error occured: " . $exception->getMessage();
             }
         }
-        return $this->connection;
+        $this->format = $format;
     }
 
     /**
@@ -45,12 +37,16 @@ class DB implements APIInterface
         $stmt = $this->connection->prepare($sqlQuery);
         try {
             $stmt->execute();
-        } catch (PDOException $exception) {
+            $result = $stmt->fetchAll();
+        } catch (\PDOException $exception) {
             echo "Error occured: " . $exception->getMessage();
             return false;
         }
 
-        return $stmt;
+        if ($this->format == APIInterface::FORMAT_XML) { //this should be added in all API methods
+            return $this->arrayToXml($result);
+        }
+        return json_encode($result);
     }
 
     public function getById($id)
