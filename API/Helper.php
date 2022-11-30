@@ -4,17 +4,6 @@ namespace API;
 
 class Helper
 {
-    function isXml(string $value): bool
-    {
-        $prev = libxml_use_internal_errors(true);
-        $doc = simplexml_load_string($value);
-        $errors = libxml_get_errors();
-        libxml_clear_errors();
-        libxml_use_internal_errors($prev);
-
-        return false !== $doc && empty($errors);
-    }
-
     public function isJSON($string): bool
     {
         return is_string($string) && is_array(json_decode($string, true));
